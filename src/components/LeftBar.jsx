@@ -1,19 +1,21 @@
 import { useContext } from "react";
-import { logout, signInWithGoogle } from "../supabase/actions";
+import { logout } from "../supabase/actions";
 import { UserContext } from "../context/UserContext";
+import { ModalContext } from "../context/ModalContext";
+import RegisterModal from "./RegisterModal";
+import LoginModal from "./LoginModal";
 
 export default function LeftBar() {
   const [data] = useContext(UserContext);
+  const { modal, setModal, loginModal, setLoginModal } =
+    useContext(ModalContext);
 
-  const handleAuthGoogle = async () => {
-    const { session, error } = await signInWithGoogle();
+  const handleRegisterModal = () => {
+    setModal((p) => !p);
+  };
 
-    if (error) {
-      console.error("Google sign-in error:", error.message);
-      return;
-    }
-
-    console.log("Logged in user session:", session);
+  const handleLoginModal = () => {
+    setLoginModal((p) => !p);
   };
 
   const handleLogout = async () => {
@@ -29,7 +31,7 @@ export default function LeftBar() {
 
   const guest = {
     image: "/avatar.png",
-    name: "Giorgi Pekshvelashvili",
+    name: "Guest",
   };
 
   const user = data?.user || guest;
@@ -52,12 +54,20 @@ export default function LeftBar() {
       </div>
 
       {user === guest ? (
-        <button
-          className="w-full h-10 bg-slate-600 mt-auto duration-300 transition-all text-white font-medium hover:bg-blue-500 hover:text-white"
-          onClick={handleAuthGoogle}
-        >
-          Log in with Google
-        </button>
+        <div className="mt-auto">
+          <button
+            className="w-full h-10 bg-slate-600 duration-300 transition-all text-white font-medium hover:bg-blue-500 hover:text-white"
+            onClick={handleRegisterModal}
+          >
+            Register
+          </button>
+          <button
+            className="w-full h-10 bg-slate-600  duration-300 transition-all text-white font-medium hover:bg-blue-500 hover:text-white"
+            onClick={handleLoginModal}
+          >
+            Log in
+          </button>
+        </div>
       ) : (
         <button
           className="w-full h-10 bg-slate-600 mt-auto duration-300 transition-all text-white font-medium hover:bg-blue-500 hover:text-white"
@@ -66,6 +76,8 @@ export default function LeftBar() {
           Log out
         </button>
       )}
+      {modal && <RegisterModal />}
+      {loginModal && <LoginModal />}
     </div>
   );
 }

@@ -31,7 +31,7 @@ export default function Main() {
         { event: "*", schema: "public", table: "messages" },
         (payload) => {
           console.log("Change received!", payload);
-          setMessages((prevMessages) => [...prevMessages, payload.new]);
+          loadMessages();
         }
       )
       .subscribe();
@@ -42,28 +42,18 @@ export default function Main() {
   }, []);
 
   const [data] = useContext(UserContext);
-  let liveData;
+  if (!data) return;
 
-  if (!data) {
-    return;
-  } else {
-    liveData = data;
-  }
-
-  const { user } = liveData;
-
-  console.log(user);
+  const { user } = data;
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
     const created_at = new Date().toISOString();
     const user_id = user.id;
-    const user_name = user.user_metadata.name;
-    const avatar_url = user.user_metadata.avatar_url;
 
     try {
-      await sendMessage(created_at, user_id, user_name, avatar_url, inputValue);
+      await sendMessage(created_at, user_id, inputValue);
       setInputValue("");
     } catch (error) {
       console.error("Error sending message:", error);
@@ -81,14 +71,14 @@ export default function Main() {
               <div key={msg.id} className={`w-full flex gap-3 mb-6 items-end`}>
                 <div className="w-16 h-16 bg-slate-800 rounded-full">
                   <img
-                    src={msg.avatar_url}
+                    src={msg.users.avatar_url}
                     alt="User Avatar"
                     className="object-cover rounded-full"
                   />
                 </div>
                 <div className="flex flex-col">
                   <span className="text-gray-300 font-inter text-sm mb-1 pl-3">
-                    {msg.user_name}
+                    {msg.users.username}
                   </span>
                   <div className="p-4 text-white rounded-full font-inter text-2xl bg-[#1e1e24] text-left">
                     {msg.content}
@@ -98,7 +88,6 @@ export default function Main() {
             ))}
           </div>
 
-          {/* Input Section */}
           <div className="mt-auto w-full h-20 rounded-[40px] bg-[#40414E] p-6 flex">
             <input
               type="text"
