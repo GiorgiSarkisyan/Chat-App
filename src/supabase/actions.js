@@ -7,7 +7,7 @@ export const signUp = async (username, email, password, file) => {
     options: {
       data: {
         display_name: username,
-        avatar_url: null,
+        avatar_url: null, // We'll update this later with either the default or uploaded avatar.
       },
     },
   });
@@ -21,20 +21,25 @@ export const signUp = async (username, email, password, file) => {
 
   let imageUrl;
 
-  const fileName = `${user.id}`;
-  const { error: uploadError } = await supabase.storage
-    .from("avatars")
-    .upload(fileName, file, {
-      cacheControl: "3600",
-      upsert: true,
-    });
+  if (file) {
+    const fileName = `${user.id}`;
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
 
-  if (uploadError) {
-    console.error("File Upload Error:", uploadError);
-    return { data: null, error: uploadError };
+    if (uploadError) {
+      console.error("File Upload Error:", uploadError);
+      return { data: null, error: uploadError };
+    }
+
+    imageUrl = `https://lpdpgehlyfxfzuurxehh.supabase.co/storage/v1/object/public/avatars/${fileName}`;
+  } else {
+    // Use the default avatar if no file was uploaded
+    imageUrl = `https://lpdpgehlyfxfzuurxehh.supabase.co/storage/v1/object/public/avatars/avatar.png`;
   }
-
-  imageUrl = `https://lpdpgehlyfxfzuurxehh.supabase.co/storage/v1/object/public/avatars/${fileName}`;
 
   const { error: updateError } = await supabase.auth.updateUser({
     data: {
