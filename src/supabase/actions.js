@@ -7,7 +7,7 @@ export const signUp = async (username, email, password, file) => {
     options: {
       data: {
         display_name: username,
-        avatar_url: null, // We'll update this later with either the default or uploaded avatar.
+        avatar_url: null,
       },
     },
   });
@@ -37,7 +37,6 @@ export const signUp = async (username, email, password, file) => {
 
     imageUrl = `https://lpdpgehlyfxfzuurxehh.supabase.co/storage/v1/object/public/avatars/${fileName}`;
   } else {
-    // Use the default avatar if no file was uploaded
     imageUrl = `https://lpdpgehlyfxfzuurxehh.supabase.co/storage/v1/object/public/avatars/avatar.png`;
   }
 

@@ -70,7 +70,7 @@ export default function Main({ data }) {
   };
 
   return (
-    <main className="p-20 w-full flex flex-col h-full">
+    <main className="p-20 w-full flex flex-col h-full overflow-auto">
       {loading ? (
         <Spinner />
       ) : (
